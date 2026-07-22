@@ -472,6 +472,7 @@ progressBar.style.width="0%";
 
 };
 
+
 //================ WORD GAME ================
 
 const gameBtn=document.getElementById("gameBtn");
@@ -524,7 +525,7 @@ let options=[targetWord.en];
 
 while(options.length<4){
 
-const w=
+let w=
 allWords[Math.floor(Math.random()*allWords.length)].en;
 
 if(!options.includes(w)){
@@ -535,25 +536,47 @@ options.push(w);
 
 options.sort(()=>Math.random()-0.5);
 
-const columns=[8,31,54,77];
+let used=[];
 
-for(let i=0;i<4;i++){
+options.forEach((word)=>{
 
-const div=document.createElement("div");
+let div=document.createElement("div");
 
 div.className="fallWord";
 
-div.textContent=options[i];
+div.textContent=word;
 
-div.style.left=columns[i]+"%";
-div.style.top="-60px";
-div.style.animationDuration=(gameSpeed/1000)+"s";
+// پیدا کردن جای تصادفی بدون برخورد
+let left;
+let tryCount=0;
 
-div.onclick=()=>checkAnswer(options[i]);
+do{
+
+left=Math.random()*88;
+
+tryCount++;
+
+}while(
+used.some(x=>Math.abs(x-left)<15)
+&& tryCount<40
+);
+
+used.push(left);
+
+div.style.left=left+"%";
+
+// هر کلمه کمی با تأخیر شروع کند
+div.style.animationDelay=(Math.random()*1.5)+"s";
+
+// سرعت‌های متفاوت
+div.style.animationDuration=
+(3+Math.random()*2)+"s";
+
+div.onclick=()=>checkAnswer(word);
 
 fallingArea.appendChild(div);
 
-}
+});
 
 clearTimeout(roundTimer);
 
@@ -567,28 +590,50 @@ endGame();
 
 }
 
-},gameSpeed+300);
+},6500);
 
 }
 function checkAnswer(selected){
 
 if(!gameRunning)return;
 
+clearTimeout(roundTimer);
+
 if(selected===targetWord.en){
 
 gameScoreNum++;
+
 gameScore.textContent=gameScoreNum;
 
-clearTimeout(roundTimer);
-
-// هر ۵ امتیاز سرعت بیشتر می‌شود
-if(gameSpeed>2000 && gameScoreNum%5===0){
-gameSpeed-=300;
+// هر ۵ امتیاز سرعت بیشتر شود
+if(gameScoreNum%5===0 && gameSpeed>2200){
+gameSpeed-=250;
 }
 
-setTimeout(startRound,300);
+const words=document.querySelectorAll(".fallWord");
+
+words.forEach(w=>{
+w.style.pointerEvents="none";
+w.style.opacity=".4";
+});
+
+setTimeout(()=>{
+
+if(gameRunning){
+
+startRound();
+
+}
+
+},500);
 
 }else{
+
+const words=document.querySelectorAll(".fallWord");
+
+words.forEach(w=>{
+w.style.pointerEvents="none";
+});
 
 alert("❌ جواب اشتباه\nامتیاز: "+gameScoreNum);
 
