@@ -443,7 +443,13 @@ background:#fff;
 border-radius:20px;
 
 box-shadow:0 8px 20px rgba(0,0,0,.15);
-
+#fallingArea{
+position:relative;
+width:100%;
+max-width:100%;
+height:70vh;
+overflow:hidden;
+                           }
 }
 
 
@@ -461,6 +467,11 @@ font-weight:bold;
 cursor:pointer;
 animation:fall linear forwards;
 user-select:none;
+  left:0;
+max-width:130px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 
