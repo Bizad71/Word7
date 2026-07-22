@@ -473,6 +473,7 @@ progressBar.style.width="0%";
 };
 
 
+
 //================ WORD GAME ================
 
 const gameBtn=document.getElementById("gameBtn");
@@ -484,29 +485,36 @@ const closeGame=document.getElementById("closeGame");
 
 let gameScoreNum=0;
 let targetWord=null;
-let gameSpeed=5000;
 let gameRunning=false;
 let roundTimer=null;
+
+// سرعت اولیه (ثانیه)
+let gameSpeed=8;
 
 gameBtn.onclick=()=>{
 
 const allWords=[...data,...learned];
 
 if(allWords.length<4){
+
 alert("حداقل ۴ کلمه لازم است");
+
 return;
+
 }
 
 gameRunning=true;
 gameScoreNum=0;
-gameSpeed=5000;
+gameSpeed=8;
 
-gameScore.textContent=0;
+gameScore.textContent="0";
+
 wordGame.style.display="block";
 
 startRound();
 
 };
+
 
 function startRound(){
 
@@ -519,7 +527,7 @@ fallingArea.innerHTML="";
 targetWord=
 allWords[Math.floor(Math.random()*allWords.length)];
 
-gameTarget.textContent="معنی: "+targetWord.fa;
+gameTarget.textContent="معنی : "+targetWord.fa;
 
 let options=[targetWord.en];
 
@@ -529,7 +537,9 @@ let w=
 allWords[Math.floor(Math.random()*allWords.length)].en;
 
 if(!options.includes(w)){
+
 options.push(w);
+
 }
 
 }
@@ -538,7 +548,7 @@ options.sort(()=>Math.random()-0.5);
 
 let used=[];
 
-options.forEach((word)=>{
+options.forEach(word=>{
 
 let div=document.createElement("div");
 
@@ -546,33 +556,40 @@ div.className="fallWord";
 
 div.textContent=word;
 
-// پیدا کردن جای تصادفی بدون برخورد
+// جای تصادفی مناسب برای موبایل
 let left;
-let tryCount=0;
+
+let retry=0;
 
 do{
 
-left=Math.random()*88;
+left=Math.random()*(fallingArea.clientWidth-140);
 
-tryCount++;
+retry++;
 
 }while(
-used.some(x=>Math.abs(x-left)<15)
-&& tryCount<40
+
+used.some(x=>Math.abs(x-left)<120)
+
+&& retry<30
+
 );
 
 used.push(left);
 
-div.style.left=left+"%";
+div.style.left=left+"px";
 
-// هر کلمه کمی با تأخیر شروع کند
-div.style.animationDelay=(Math.random()*1.5)+"s";
+// شروع با تأخیر تصادفی
+div.style.animationDelay=(Math.random()*1.2)+"s";
 
-// سرعت‌های متفاوت
-div.style.animationDuration=
-(3+Math.random()*2)+"s";
+// سرعت سقوط
+div.style.animationDuration=gameSpeed+"s";
 
-div.onclick=()=>checkAnswer(word);
+div.onclick=()=>{
+
+checkAnswer(word);
+
+};
 
 fallingArea.appendChild(div);
 
@@ -590,9 +607,9 @@ endGame();
 
 }
 
-},6500);
+},(gameSpeed+1)*1000);
 
-}
+  }
 function checkAnswer(selected){
 
 if(!gameRunning)return;
@@ -602,19 +619,33 @@ clearTimeout(roundTimer);
 if(selected===targetWord.en){
 
 gameScoreNum++;
-
 gameScore.textContent=gameScoreNum;
 
-// هر ۵ امتیاز سرعت بیشتر شود
-if(gameScoreNum%5===0 && gameSpeed>2200){
-gameSpeed-=250;
+// افزایش سرعت در امتیازهای 10،20،30...
+if(gameScoreNum===10){
+gameSpeed=7;
+}
+
+if(gameScoreNum===20){
+gameSpeed=6;
+}
+
+if(gameScoreNum===30){
+gameSpeed=5;
+}
+
+if(gameScoreNum===40){
+gameSpeed=4;
+}
+
+if(gameScoreNum===50){
+gameSpeed=3;
 }
 
 const words=document.querySelectorAll(".fallWord");
 
 words.forEach(w=>{
 w.style.pointerEvents="none";
-w.style.opacity=".4";
 });
 
 setTimeout(()=>{
@@ -625,17 +656,11 @@ startRound();
 
 }
 
-},500);
+},400);
 
 }else{
 
-const words=document.querySelectorAll(".fallWord");
-
-words.forEach(w=>{
-w.style.pointerEvents="none";
-});
-
-alert("❌ جواب اشتباه\nامتیاز: "+gameScoreNum);
+alert("❌ جواب اشتباه\n\nامتیاز شما: "+gameScoreNum);
 
 endGame();
 
