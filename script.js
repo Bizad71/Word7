@@ -481,195 +481,139 @@ const gameTarget=document.getElementById("gameTarget");
 const gameScore=document.getElementById("gameScore");
 const closeGame=document.getElementById("closeGame");
 
-
 let gameScoreNum=0;
 let targetWord=null;
-let gameTimer;
-
+let gameSpeed=5000;
+let gameRunning=false;
+let roundTimer=null;
 
 gameBtn.onclick=()=>{
 
-let allWords=[...data,...learned];
+const allWords=[...data,...learned];
 
 if(allWords.length<4){
-
 alert("حداقل ۴ کلمه لازم است");
-
 return;
-
 }
 
-
-wordGame.style.display="block";
-
+gameRunning=true;
 gameScoreNum=0;
+gameSpeed=5000;
 
 gameScore.textContent=0;
+wordGame.style.display="block";
 
-startWordGame();
+startRound();
 
 };
 
+function startRound(){
 
+if(!gameRunning)return;
 
-function startWordGame(){
+const allWords=[...data,...learned];
 
-let allWords=[...data,...learned];
+fallingArea.innerHTML="";
 
 targetWord=
 allWords[Math.floor(Math.random()*allWords.length)];
 
+gameTarget.textContent="معنی: "+targetWord.fa;
 
-gameTarget.textContent=
-"معنی: "+targetWord.fa;
+let options=[targetWord.en];
 
+while(options.length<4){
 
-fallingArea.innerHTML="";
-
-
-clearInterval(gameTimer);
-
-
-gameTimer=setInterval(()=>{
-
-
-createFallingWord(allWords);
-
-
-},1200);
-
-
-}
-
-
-
-function createFallingWord(allWords){
-
-
-let correct=targetWord.en;
-
-
-let words=[correct];
-
-
-while(words.length<4){
-
-let w=
+const w=
 allWords[Math.floor(Math.random()*allWords.length)].en;
 
-
-if(!words.includes(w)){
-
-words.push(w);
-
+if(!options.includes(w)){
+options.push(w);
 }
 
 }
 
+options.sort(()=>Math.random()-0.5);
 
-words.sort(()=>Math.random()-0.5);
+const columns=[8,31,54,77];
 
+for(let i=0;i<4;i++){
 
-words.forEach(word=>{
-
-
-let div=document.createElement("div");
+const div=document.createElement("div");
 
 div.className="fallWord";
 
-div.textContent=word;
+div.textContent=options[i];
 
+div.style.left=columns[i]+"%";
+div.style.top="-60px";
+div.style.animationDuration=(gameSpeed/1000)+"s";
 
-div.style.left=
-Math.random()*80+"%";
-
-
-div.style.animationDuration=
-(3+Math.random()*3)+"s";
-
-
-
-div.onclick=()=>{
-
-
-if(word===correct){
-
-
-gameScoreNum++;
-
-gameScore.textContent=gameScoreNum;
-
-nextGameWord();
-
-
-}else{
-
-alert("باختی 😢 امتیاز: "+gameScoreNum);
-
-endGame();
-
-}
-
-
-};
-
+div.onclick=()=>checkAnswer(options[i]);
 
 fallingArea.appendChild(div);
 
+}
 
+clearTimeout(roundTimer);
 
-setTimeout(()=>{
+roundTimer=setTimeout(()=>{
 
-if(div.parentNode){
+if(gameRunning){
 
-if(word===correct){
-
-alert("فرصت از دست رفت 😢");
+alert("⏰ زمان تمام شد");
 
 endGame();
 
 }
 
-div.remove();
+},gameSpeed+300);
+
+}
+function checkAnswer(selected){
+
+if(!gameRunning)return;
+
+if(selected===targetWord.en){
+
+gameScoreNum++;
+gameScore.textContent=gameScoreNum;
+
+clearTimeout(roundTimer);
+
+// هر ۵ امتیاز سرعت بیشتر می‌شود
+if(gameSpeed>2000 && gameScoreNum%5===0){
+gameSpeed-=300;
+}
+
+setTimeout(startRound,300);
+
+}else{
+
+alert("❌ جواب اشتباه\nامتیاز: "+gameScoreNum);
+
+endGame();
 
 }
 
-
-},6000);
-
-
-
-});
-
-
 }
-
-
-
-function nextGameWord(){
-
-targetWord=
-[...data,...learned]
-[Math.floor(Math.random()*([...data,...learned].length))];
-
-
-gameTarget.textContent=
-"معنی: "+targetWord.fa;
-
-}
-
 
 
 function endGame(){
 
-clearInterval(gameTimer);
+gameRunning=false;
 
-wordGame.style.display="none";
+clearTimeout(roundTimer);
 
 fallingArea.innerHTML="";
+
+wordGame.style.display="none";
 
 }
 
 
+closeGame.onclick=()=>{
 
-closeGame.onclick=endGame;
+endGame();
+
+};
