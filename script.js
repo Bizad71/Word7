@@ -486,8 +486,13 @@ let targetWord=null;
 let gameRunning=false;
 let roundTimer=null;
 
+
+
 // سرعت اولیه
 let gameSpeed=8;
+let bestScore=Number(localStorage.getItem("bestScore")||0);
+
+document.getElementById("bestScore").textContent=bestScore;
 
 gameBtn.onclick=()=>{
 
@@ -631,6 +636,15 @@ gameScoreNum++;
 
 gameScore.textContent=gameScoreNum;
 
+  if(gameScoreNum>bestScore){
+
+bestScore=gameScoreNum;
+
+localStorage.setItem("bestScore",bestScore);
+
+document.getElementById("bestScore").textContent=bestScore;
+
+  }
 // افزایش سرعت
 if(gameScoreNum>=10 && gameScoreNum<20){
 gameSpeed=7;
