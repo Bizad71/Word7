@@ -472,6 +472,8 @@ max-width:130px;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
+  width:90px;
+text-align:center;
 }
 
 
