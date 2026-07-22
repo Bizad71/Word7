@@ -470,10 +470,8 @@ quizResult.style.display="none";
 
 progressBar.style.width="0%";
 
-};
 
-
-
+}
 //================ WORD GAME ================
 
 const gameBtn=document.getElementById("gameBtn");
@@ -488,7 +486,7 @@ let targetWord=null;
 let gameRunning=false;
 let roundTimer=null;
 
-// سرعت اولیه (ثانیه)
+// سرعت اولیه
 let gameSpeed=8;
 
 gameBtn.onclick=()=>{
@@ -496,11 +494,8 @@ gameBtn.onclick=()=>{
 const allWords=[...data,...learned];
 
 if(allWords.length<4){
-
 alert("حداقل ۴ کلمه لازم است");
-
 return;
-
 }
 
 gameRunning=true;
@@ -533,57 +528,66 @@ let options=[targetWord.en];
 
 while(options.length<4){
 
-let w=
-allWords[Math.floor(Math.random()*allWords.length)].en;
+let w=allWords[
+Math.floor(Math.random()*allWords.length)
+].en;
 
 if(!options.includes(w)){
-
 options.push(w);
-
 }
 
 }
 
 options.sort(()=>Math.random()-0.5);
 
-let used=[];
+// ----------------------------
+// ساخت ستون‌های تصادفی
+// ----------------------------
 
-options.forEach(word=>{
+const cols=10;
 
-let div=document.createElement("div");
+const columnWidth=
+fallingArea.clientWidth/cols;
+
+let freeColumns=[0,1,2,3,4,5,6,7,8,9];
+
+freeColumns.sort(()=>Math.random()-0.5);
+
+options.forEach((word,index)=>{
+
+const div=document.createElement("div");
 
 div.className="fallWord";
 
 div.textContent=word;
 
-// جای تصادفی مناسب برای موبایل
-let left;
+const col=freeColumns[index];
 
-let retry=0;
+const offset=(Math.random()*20)-10;
 
-do{
+let left=
+(col*columnWidth)+
+(columnWidth/2)-55+
+offset;
 
-left=Math.random()*(fallingArea.clientWidth-140);
-
-retry++;
-
-}while(
-
-used.some(x=>Math.abs(x-left)<120)
-
-&& retry<30
-
+// جلوگیری از خروج از صفحه
+left=Math.max(
+10,
+Math.min(
+left,
+fallingArea.clientWidth-120
+)
 );
-
-used.push(left);
 
 div.style.left=left+"px";
 
-// شروع با تأخیر تصادفی
-div.style.animationDelay=(Math.random()*1.2)+"s";
+div.style.top="-60px";
 
-// سرعت سقوط
-div.style.animationDuration=gameSpeed+"s";
+div.style.animationDelay=
+(Math.random()*1.5)+"s";
+
+div.style.animationDuration=
+gameSpeed+"s";
 
 div.onclick=()=>{
 
@@ -607,45 +611,43 @@ endGame();
 
 }
 
-},(gameSpeed+1)*1000);
+},(gameSpeed+2)*1000);
 
-  }
+}
 function checkAnswer(selected){
 
 if(!gameRunning)return;
 
 clearTimeout(roundTimer);
 
+// همه کلمات غیرقابل کلیک شوند
+document.querySelectorAll(".fallWord").forEach(w=>{
+w.style.pointerEvents="none";
+});
+
 if(selected===targetWord.en){
 
 gameScoreNum++;
+
 gameScore.textContent=gameScoreNum;
 
-// افزایش سرعت در امتیازهای 10،20،30...
-if(gameScoreNum===10){
+// افزایش سرعت
+if(gameScoreNum>=10 && gameScoreNum<20){
 gameSpeed=7;
-}
-
-if(gameScoreNum===20){
+}else if(gameScoreNum>=20 && gameScoreNum<30){
 gameSpeed=6;
-}
-
-if(gameScoreNum===30){
+}else if(gameScoreNum>=30 && gameScoreNum<40){
 gameSpeed=5;
-}
-
-if(gameScoreNum===40){
+}else if(gameScoreNum>=40 && gameScoreNum<50){
 gameSpeed=4;
-}
-
-if(gameScoreNum===50){
+}else if(gameScoreNum>=50){
 gameSpeed=3;
 }
 
-const words=document.querySelectorAll(".fallWord");
-
-words.forEach(w=>{
-w.style.pointerEvents="none";
+// محو شدن کلمات
+document.querySelectorAll(".fallWord").forEach(w=>{
+w.style.transition=".25s";
+w.style.opacity="0";
 });
 
 setTimeout(()=>{
@@ -656,7 +658,7 @@ startRound();
 
 }
 
-},400);
+},300);
 
 }else{
 
@@ -664,17 +666,46 @@ gameScoreNum--;
 
 gameScore.textContent=gameScoreNum;
 
+// قرمز شدن جواب اشتباه
+document.querySelectorAll(".fallWord").forEach(w=>{
+
+if(w.textContent===selected){
+
+w.style.background="#ef4444";
+
+}
+
+if(w.textContent===targetWord.en){
+
+w.style.background="#22c55e";
+
+}
+
+});
+
 if(gameScoreNum<0){
+
+setTimeout(()=>{
 
 alert("💀 امتیازت منفی شد!\n\nبازی تمام شد.");
 
 endGame();
 
+},700);
+
 return;
 
 }
 
-alert("❌ اشتباه!\n1 امتیاز کم شد.");
+setTimeout(()=>{
+
+if(gameRunning){
+
+startRound();
+
+}
+
+},800);
 
 }
 
@@ -699,3 +730,4 @@ closeGame.onclick=()=>{
 endGame();
 
 };
+
