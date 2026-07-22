@@ -515,7 +515,6 @@ startRound();
 
 };
 
-
 function startRound(){
 
 if(!gameRunning)return;
@@ -529,34 +528,46 @@ allWords[Math.floor(Math.random()*allWords.length)];
 
 gameTarget.textContent="معنی : "+targetWord.fa;
 
+
+// ساخت گزینه‌ها
 let options=[targetWord.en];
 
 while(options.length<4){
 
-let w=allWords[
-Math.floor(Math.random()*allWords.length)
-].en;
+let w=
+allWords[Math.floor(Math.random()*allWords.length)].en;
 
 if(!options.includes(w)){
+
 options.push(w);
+
 }
 
 }
 
 options.sort(()=>Math.random()-0.5);
 
-// ----------------------------
-// ساخت ستون‌های تصادفی
-// ----------------------------
 
-const cols=10;
+// ---------- مسیرهای حرکت ----------
 
-const columnWidth=
-fallingArea.clientWidth/cols;
+const laneCount=12;
 
-let freeColumns=[0,1,2,3,4,5,6,7,8,9];
+const laneWidth=
+fallingArea.clientWidth/laneCount;
 
-freeColumns.sort(()=>Math.random()-0.5);
+let lanes=[];
+
+for(let i=0;i<laneCount;i++){
+
+lanes.push(i);
+
+}
+
+// مسیرها را مخلوط کن
+lanes.sort(()=>Math.random()-0.5);
+
+
+// ---------- ساخت کلمات ----------
 
 options.forEach((word,index)=>{
 
@@ -566,33 +577,38 @@ div.className="fallWord";
 
 div.textContent=word;
 
-const col=freeColumns[index];
 
-const offset=(Math.random()*20)-10;
+// هر کلمه یک مسیر جدا
+let lane=lanes[index];
 
 let left=
-(col*columnWidth)+
-(columnWidth/2)-55+
-offset;
+lane*laneWidth+
+(Math.random()*(laneWidth-90));
 
-// جلوگیری از خروج از صفحه
-left=Math.max(
-10,
-Math.min(
+
+// از کادر بیرون نزند
+left=Math.max(5,left);
+
+left=Math.min(
 left,
-fallingArea.clientWidth-120
-)
+fallingArea.clientWidth-110
 );
+
 
 div.style.left=left+"px";
 
 div.style.top="-60px";
 
-div.style.animationDelay=
-(Math.random()*1.5)+"s";
 
+// هر کلمه کمی دیرتر شروع شود
+div.style.animationDelay=
+(index*0.35)+"s";
+
+
+// سرعت
 div.style.animationDuration=
 gameSpeed+"s";
+
 
 div.onclick=()=>{
 
@@ -600,9 +616,11 @@ checkAnswer(word);
 
 };
 
+
 fallingArea.appendChild(div);
 
 });
+
 
 clearTimeout(roundTimer);
 
