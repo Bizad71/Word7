@@ -660,9 +660,21 @@ startRound();
 
 }else{
 
-alert("❌ جواب اشتباه\n\nامتیاز شما: "+gameScoreNum);
+gameScoreNum--;
+
+gameScore.textContent=gameScoreNum;
+
+if(gameScoreNum<0){
+
+alert("💀 امتیازت منفی شد!\n\nبازی تمام شد.");
 
 endGame();
+
+return;
+
+}
+
+alert("❌ اشتباه!\n1 امتیاز کم شد.");
 
 }
 
