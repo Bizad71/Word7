@@ -372,6 +372,14 @@ btn.textContent=answers[index];
 
 btn.onclick=()=>{
 
+speechSynthesis.cancel();
+
+const u=new SpeechSynthesisUtterance(btn.textContent);
+
+u.lang="en-US";
+u.rate=0.9;
+
+speechSynthesis.speak(u);
 answerBtns.forEach(b=>b.disabled=true);
 
 if(btn.textContent===q.en){
