@@ -436,7 +436,7 @@ overflow:hidden;
 
 margin:20px auto;
 
-max-width:600px;
+max-width:900px;
 
 background:#fff;
 
@@ -448,25 +448,19 @@ box-shadow:0 8px 20px rgba(0,0,0,.15);
 
 
 .fallWord{
-
 position:absolute;
-
-top:-40px;
-
+width:120px;
+text-align:center;
+top:-60px;
 background:#4d9b7d;
-
-color:white;
-
-padding:12px 20px;
-
-border-radius:15px;
-
-font-size:22px;
-
+color:#fff;
+padding:12px;
+border-radius:14px;
+font-size:20px;
+font-weight:bold;
 cursor:pointer;
-
-animation:fall linear;
-
+animation:fall linear forwards;
+user-select:none;
 }
 
 
